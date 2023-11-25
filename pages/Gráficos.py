@@ -1,44 +1,66 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import os
-
+import datetime
 
 df = pd.read_csv('src/ITAI.csv')
+
+df['data'] = pd.to_datetime(df['data'])
 
 st.set_page_config(page_title='NORTE - Gráficos :)', page_icon='src/img/sat.png', layout='wide')
 
 st.title('Gráficos - ITAI')
 
-# st.title('Bem-vindo a demonstração da biblioteca Streamlit para a criação de paineis de dados interativos!', ali)
-st.markdown("<h1 style='text-align: left; color: white;'>Bem-vindo a demonstração da biblioteca Streamlit <br/> para a criação de paineis de dados interativos!</h1>",
-            unsafe_allow_html=True)
+st.divider()
+
+# If x Data
+if_data = px.line(df, x='data', y='If', color='satelite', title='If x Data | Satélite', template='plotly')
+st.plotly_chart(if_data, use_container_width=True, height= 600)
+
+
+st.header('Mapa: gIfv x satélite')
+
+
+map_gIfv = px.scatter_mapbox(df, lat="IPPlat", lon="IPPlon", color="satelite", size="gIfv",
+                  color_continuous_scale=px.colors.cyclical.IceFire, size_max=22, zoom=5,
+                  mapbox_style="carto-positron")
+
+map_gIfv.update_layout(height=800)
+
+st.plotly_chart(map_gIfv, use_container_width=True, height=800)
 
 st.divider()
 
-st.markdown("<h2 style='text-align: left; color: white;'>Possibilidades da Biblioteca</h2>",
-            unsafe_allow_html=True)
 
-col1, col2 = st.columns(2, gap='medium')
+st.header('Mapa: gIfv x satélite | animado')
+st.subheader('Ano de 2017 | só esperar um tiquin q ele carrega :)')
 
-with col1:
-    equation = st.text_area(
-        'Podemos criar áreas de texto para compilar fórmulas, entrada de texto e muitos afins.'
-        'Caso queira testar, basta alterar o texto abaixo e pressionar Cntrl + Enter na caixa de texto que o texto será compilado!',
-        'e^{i\pi} + 1 = 0'
-    )
+df_filtered = df[(df['data'] >= '2017-01-01') & (df['data'] <= '2017-12-31')]
+
+map_gIfv = px.scatter_mapbox(df_filtered, lat="IPPlat", lon="IPPlon", color="satelite", size="gIfv",
+                  color_continuous_scale=px.colors.cyclical.IceFire, size_max=33, zoom=5,
+                  mapbox_style="carto-positron", animation_frame='data')
+
+map_gIfv.update_layout(height=800)
+
+st.plotly_chart(map_gIfv, use_container_width=True, height=800)
 
 
-with col2:
-    st.latex(equation)
 
-st.divider()
 
-st.subheader('Caso queira colocar alguma métrica e afins. É possível coletar respostas de API (previsão do tempo, bolsa de valores e afins)')
 
-st.text('Aqui n tem nada de requisição, mas fica a demonstração visual :)')
 
-col1, col2, col3 = st.columns(3)
-col1.metric("Temperature", "70 °F", "1.2 °F")
-col2.metric("Wind", "9 mph", "-8%")
-col3.metric("Humidity", "86%", "4%")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
